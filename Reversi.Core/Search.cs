@@ -30,13 +30,17 @@ public sealed record SearchResult(
     long Leaves,
     long Cutoffs,
     double Milliseconds,
-    List<TraceEntry> Trace);
+    List<TraceEntry> Trace)
+{
+    public long Extensions { get; init; }
+}
 
 public sealed class SearchEngine
 {
     readonly List<TraceEntry> trace = new();
-    long nodes, leaves, cutoffs;
+    long nodes, leaves, cutoffs, extensions;
     int nextId;
+    int extraDepthLimit;
     sbyte max;
     CancellationToken token;
 
@@ -47,7 +51,8 @@ public sealed class SearchEngine
         Ordering order = Ordering.Natural,
         EvaluationMode evaluation = EvaluationMode.Positional,
         int traceLimit = 2500,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        int quiescenceDepth = 0)
     {
         ArgumentNullException.ThrowIfNull(board);
         if (depth < 1 || depth > 12)
@@ -58,9 +63,12 @@ public sealed class SearchEngine
             throw new ArgumentOutOfRangeException(nameof(order));
         if (!Enum.IsDefined(evaluation))
             throw new ArgumentOutOfRangeException(nameof(evaluation));
+        if (quiescenceDepth < 0 || quiescenceDepth > 4)
+            throw new ArgumentOutOfRangeException(nameof(quiescenceDepth));
         token = cancellationToken;
+        extraDepthLimit = quiescenceDepth;
         max = board.Turn;
-        nodes = leaves = cutoffs = 0;
+        nodes = leaves = cutoffs = extensions = 0;
         nextId = 0;
         trace.Clear();
         var watch = Stopwatch.StartNew();
@@ -75,7 +83,8 @@ public sealed class SearchEngine
             null,
             "ROOT",
             0,
-            traceLimit);
+            traceLimit,
+            quiescenceDepth);
         watch.Stop();
         return new(
             move,
@@ -84,7 +93,10 @@ public sealed class SearchEngine
             leaves,
             cutoffs,
             watch.Elapsed.TotalMilliseconds,
-            new(trace));
+            new(trace))
+        {
+            Extensions = extensions
+        };
     }
 
     (int, Move?) Visit(
@@ -98,27 +110,43 @@ public sealed class SearchEngine
         int? parent,
         string moveName,
         int ply,
-        int traceLimit)
+        int traceLimit,
+        int extraDepth)
     {
         token.ThrowIfCancellationRequested();
         int id = nextId++;
         nodes++;
         int origA = alpha, origB = beta;
         bool maximizing = b.Turn == max;
-        if (b.IsTerminal || depth == 0)
+        bool terminal = b.IsTerminal;
+        bool extend = !terminal
+            && depth == 0
+            && extraDepth > 0
+            && PositionAnalysis.Classify(b) == PositionKind.Risky;
+
+        if (terminal || (depth == 0 && !extend))
         {
             leaves++;
-            int val = b.IsTerminal ? Evaluation.Utility(b, max) : Evaluation.Estimate(b, max, mode);
-            Log(val, false, b.IsTerminal ? "terminal" : "depth limit");
+            int val = terminal ? Evaluation.Utility(b, max) : Evaluation.Estimate(b, max, mode);
+            string reason = terminal ? "terminal"
+                : extraDepthLimit == 0 ? "depth limit"
+                : extraDepth == 0 ? "quiescence limit"
+                : "quiet position";
+            Log(val, false, reason);
             return (val, null);
         }
 
+        if (extend)
+            extensions++;
+
+        int childDepth = Math.Max(0, depth - 1);
+        int childExtraDepth = extend ? extraDepth - 1 : extraDepth;
         var moves = b.LegalMoves(b.Turn);
         if (moves.Count == 0)
         {
             var (passScore, _) = Visit(
                 b.Play(null),
-                depth - 1,
+                childDepth,
                 alpha,
                 beta,
                 ab,
@@ -127,8 +155,9 @@ public sealed class SearchEngine
                 id,
                 "PASS",
                 ply + 1,
-                traceLimit);
-            Log(passScore, false, "forced pass");
+                traceLimit,
+                childExtraDepth);
+            Log(passScore, false, extend ? "quiescence extension; forced pass" : "forced pass");
             return (passScore, null);
         }
 
@@ -154,7 +183,7 @@ public sealed class SearchEngine
             remaining--;
             var (v, _) = Visit(
                 b.Play(move),
-                depth - 1,
+                childDepth,
                 alpha,
                 beta,
                 ab,
@@ -163,7 +192,8 @@ public sealed class SearchEngine
                 id,
                 move.ToString(),
                 ply + 1,
-                traceLimit);
+                traceLimit,
+                childExtraDepth);
             if (maximizing ? (v > best) : (v < best))
             {
                 best = v;
@@ -185,7 +215,8 @@ public sealed class SearchEngine
             }
         }
 
-        Log(best, cutoff, cutoff ? "alpha >= beta" : "expanded");
+        string expansionReason = cutoff ? "alpha >= beta" : "expanded";
+        Log(best, cutoff, extend ? "quiescence extension; " + expansionReason : expansionReason);
         return (best, chosen);
         // Reserve by preorder ID, retaining the root and all ancestors even when truncated.
         void Log(int value, bool cut, string reason)

@@ -1,0 +1,44 @@
+[
+  {
+    "Id": 2,
+    "Parent": 1,
+    "Ply": 2,
+    "Player": "MAX",
+    "Move": "A1",
+    "Score": -100064,
+    "AlphaBefore": -2147483648,
+    "BetaBefore": 2147483647,
+    "AlphaAfter": -2147483648,
+    "BetaAfter": 2147483647,
+    "Cutoff": false,
+    "Reason": "terminal"
+  },
+  {
+    "Id": 1,
+    "Parent": 0,
+    "Ply": 1,
+    "Player": "MIN",
+    "Move": "PASS",
+    "Score": -100064,
+    "AlphaBefore": -2147483648,
+    "BetaBefore": 2147483647,
+    "AlphaAfter": -2147483648,
+    "BetaAfter": -100064,
+    "Cutoff": false,
+    "Reason": "quiescence extension; expanded"
+  },
+  {
+    "Id": 0,
+    "Parent": null,
+    "Ply": 0,
+    "Player": "MAX",
+    "Move": "ROOT",
+    "Score": -100064,
+    "AlphaBefore": -2147483648,
+    "BetaBefore": 2147483647,
+    "AlphaAfter": -2147483648,
+    "BetaAfter": 2147483647,
+    "Cutoff": false,
+    "Reason": "forced pass"
+  }
+]

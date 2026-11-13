@@ -5,8 +5,14 @@ using System.Runtime.InteropServices;
 using Reversi.Core;
 
 CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
-string output = args.Length > 0 ? args[0] : "results";
+bool quiescenceExamples = args.Contains("--quiescence");
+string output = args.FirstOrDefault(argument => argument != "--quiescence") ?? "results";
 Directory.CreateDirectory(output);
+if (quiescenceExamples)
+{
+    RunQuiescenceExamples(output);
+    return;
+}
 var positions = new Dictionary<string, Board>
 {
     {
@@ -130,5 +136,73 @@ File.WriteAllText(
 if (traced.Trace.Count != traced.Nodes)
     throw new Exception("Report trace unexpectedly truncated");
 Console.WriteLine($"Completed {measurements.Count} verified measurements. Results written to " + Path.GetFullPath(output));
+
+void RunQuiescenceExamples(string directory)
+{
+    var riskyCorner = Board.FromRows(new[]
+    {
+        ".WBBBBB.",
+        "BBBBBBBW",
+        "BBBBBBBB",
+        "BBBBBBBB",
+        "BBBBBBBB",
+        "BBBBBBBB",
+        "BBBBBBBB",
+        "BBBBBBBB"
+    });
+    var riskyPass = Board.FromRows(new[]
+    {
+        ".WBBBBBB",
+        "BBBBBBBB",
+        "BBBBBBBB",
+        "BBBBBBBB",
+        "BBBBBBBB",
+        "BBBBBBBB",
+        "BBBBBBBB",
+        "BBBBBBBB"
+    }, -1);
+    var examples = new[]
+    {
+        (Name: "quiet", Board: new Board()),
+        (Name: "risky_corner", Board: riskyCorner),
+        (Name: "risky_pass", Board: riskyPass)
+    };
+
+    using var csv = new StreamWriter(
+        Path.Combine(directory, "quiescence.csv"), false, new UTF8Encoding(false));
+    csv.WriteLine("position,kind,depth,extra_depth,method,move,score,nodes,extensions,milliseconds");
+
+    foreach (var example in examples)
+    {
+        foreach (int extraDepth in new[] { 0, 2 })
+        {
+            var plain = new SearchEngine().FindBest(
+                example.Board, 1, false, Ordering.BestFirst, traceLimit: 0,
+                quiescenceDepth: extraDepth);
+            var optimized = new SearchEngine().FindBest(
+                example.Board, 1, true, Ordering.BestFirst, traceLimit: 1000,
+                quiescenceDepth: extraDepth);
+
+            if (plain.Score != optimized.Score || optimized.Nodes > plain.Nodes)
+                throw new Exception("Quiescence search mismatch: " + example.Name);
+
+            var measurements = new[]
+            {
+                (Method: "minimax", Result: plain),
+                (Method: "alphabeta", Result: optimized)
+            };
+            foreach (var measurement in measurements)
+            {
+                var result = measurement.Result;
+                csv.WriteLine($"{example.Name},{PositionAnalysis.Classify(example.Board)},1,{extraDepth},{measurement.Method},{result.Move?.ToString() ?? "PASS"},{result.Score},{result.Nodes},{result.Extensions},{result.Milliseconds:F4}");
+            }
+
+            File.WriteAllText(
+                Path.Combine(directory, $"quiescence_{example.Name}_{extraDepth}.json"),
+                JsonSerializer.Serialize(optimized.Trace, new JsonSerializerOptions { WriteIndented = true }));
+            Console.WriteLine($"{example.Name}: {PositionAnalysis.Classify(example.Board)}, extra={extraDepth}, score={optimized.Score}, nodes={optimized.Nodes}, extensions={optimized.Extensions}");
+        }
+    }
+}
 
 sealed record Measurement(string Position, int Depth, string Method, string Ordering, string Evaluation, SearchResult Result);

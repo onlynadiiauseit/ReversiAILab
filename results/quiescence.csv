@@ -1,0 +1,13 @@
+position,kind,depth,extra_depth,method,move,score,nodes,extensions,milliseconds
+quiet,Quiet,1,0,minimax,D3,-28,5,0,28.1841
+quiet,Quiet,1,0,alphabeta,D3,-28,5,0,1.4407
+quiet,Quiet,1,2,minimax,D3,-28,5,0,1.0956
+quiet,Quiet,1,2,alphabeta,D3,-28,5,0,0.9993
+risky_corner,Risky,1,0,minimax,A1,1188,3,0,0.1615
+risky_corner,Risky,1,0,alphabeta,A1,1188,3,0,0.1232
+risky_corner,Risky,1,2,minimax,A1,100064,7,4,0.5971
+risky_corner,Risky,1,2,alphabeta,A1,100064,7,4,0.3760
+risky_pass,Risky,1,0,minimax,PASS,-1188,2,0,0.0527
+risky_pass,Risky,1,0,alphabeta,PASS,-1188,2,0,0.0331
+risky_pass,Risky,1,2,minimax,PASS,-100064,3,1,0.9984
+risky_pass,Risky,1,2,alphabeta,PASS,-100064,3,1,0.0726

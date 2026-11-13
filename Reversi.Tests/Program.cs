@@ -232,4 +232,70 @@ for (int seed = 0; seed < 8; seed++)
     Check(valid && transitions >= 60, $"full legal game invariants seed={seed}");
 }
 
+Check(PositionAnalysis.Classify(b) == PositionKind.Quiet, "opening is quiet");
+Check(PositionAnalysis.Classify(passBoard) == PositionKind.Risky, "forced pass is risky");
+Check(PositionAnalysis.Classify(passBoard.Play(null)) == PositionKind.Risky, "available corner is risky");
+Check(PositionAnalysis.Classify(full) == PositionKind.Terminal, "terminal position classification");
+Throws<ArgumentNullException>(() => PositionAnalysis.Classify(null!), "null position analysis rejected");
+Throws<ArgumentOutOfRangeException>(
+    () => new SearchEngine().FindBest(b, 1, true, quiescenceDepth: -1),
+    "negative extension depth rejected");
+Throws<ArgumentOutOfRangeException>(
+    () => new SearchEngine().FindBest(b, 1, true, quiescenceDepth: 5),
+    "excessive extension depth rejected");
+
+var quietPlain = new SearchEngine().FindBest(b, 1, true);
+var quietExtended = new SearchEngine().FindBest(b, 1, true, quiescenceDepth: 2);
+Check(quietPlain.Score == quietExtended.Score && quietPlain.Nodes == quietExtended.Nodes,
+    "quiet horizon uses the heuristic immediately");
+Check(quietExtended.Extensions == 0 && quietExtended.Trace.Any(x => x.Reason == "quiet position"),
+    "quiet leaves are identified in the trace");
+
+var riskyCorner = Board.FromRows(new[]
+{
+    ".WBBBBB.",
+    "BBBBBBBW",
+    "BBBBBBBB",
+    "BBBBBBBB",
+    "BBBBBBBB",
+    "BBBBBBBB",
+    "BBBBBBBB",
+    "BBBBBBBB"
+});
+var resolved = new SearchEngine().FindBest(riskyCorner, 1, true, quiescenceDepth: 2);
+Check(resolved.Score == Exact(riskyCorner, riskyCorner.Turn),
+    "corner continuation resolves the tactical ending exactly");
+Check(resolved.Extensions > 0 && resolved.Trace.Any(x => x.Ply > 1),
+    "risky leaves extend beyond normal depth");
+var bounded = new SearchEngine().FindBest(riskyCorner, 1, true, quiescenceDepth: 1);
+Check(bounded.Trace.Max(x => x.Ply) <= 2 && bounded.Trace.Any(x => x.Reason == "quiescence limit"),
+    "extension budget strictly bounds the horizon");
+var resolvedPass = new SearchEngine().FindBest(passBoard, 1, true, quiescenceDepth: 2);
+Check(resolvedPass.Move is null && resolvedPass.Score == -100064,
+    "forced pass continuation preserves root perspective");
+Check(resolvedPass.Trace.Any(x => x.Reason == "terminal"),
+    "terminal utility takes priority during extension");
+
+foreach (var position in new[] { b, riskyCorner, passBoard })
+    foreach (var mode in Enum.GetValues<EvaluationMode>())
+        foreach (var order in Enum.GetValues<Ordering>())
+        {
+            var plain = new SearchEngine().FindBest(position, 1, false, order, mode, 0,
+                quiescenceDepth: 2);
+            var optimized = new SearchEngine().FindBest(position, 1, true, order, mode, 1000,
+                quiescenceDepth: 2);
+            Check(plain.Score == optimized.Score && optimized.Nodes <= plain.Nodes,
+                $"same extended minimax value {PositionAnalysis.Classify(position)} {mode} {order}");
+            Check(optimized.Trace.All(x => x.Ply <= 3), "extended search respects maximum ply");
+        }
+
+using (var cts = new CancellationTokenSource())
+{
+    cts.Cancel();
+    Throws<OperationCanceledException>(
+        () => new SearchEngine().FindBest(riskyCorner, 1, true,
+            cancellationToken: cts.Token, quiescenceDepth: 2),
+        "extended search cancellation");
+}
+
 Console.WriteLine($"ALL {pass} TESTS PASSED");

@@ -35,6 +35,12 @@ public sealed class MainForm : Form
     {
         AutoSize = true
     };
+    readonly CheckBox quiescence = new()
+    {
+        Text = "Продовжувати гострі позиції (+2)",
+        AutoSize = true,
+        Checked = true
+    };
     readonly TextBox details = new()
     {
         Multiline = true,
@@ -111,6 +117,7 @@ public sealed class MainForm : Form
             Padding = new Padding(5, 7, 0, 0)
         });
         top.Controls.Add(depth);
+        top.Controls.Add(quiescence);
         left.Controls.Add(top, 0, 0);
         view.Dock = DockStyle.Fill;
         view.Board = board;
@@ -187,6 +194,7 @@ public sealed class MainForm : Form
     {
         ai.Enabled = restart.Enabled = compare.Enabled = trace.Enabled = algo.Enabled = evaluation.Enabled = ordering.Enabled = depth.Enabled = view.Enabled = !busy;
         cancel.Enabled = busy;
+        quiescence.Enabled = !busy;
         UseWaitCursor = busy;
     }
 
@@ -200,6 +208,13 @@ public sealed class MainForm : Form
         view.Invalidate();
         var m = board.LegalMoves(board.Turn);
         status.Text = $"Чорні: {board.Count(1)}   Білі: {board.Count(-1)}   Хід: {(board.Turn == 1 ? "чорні" : "білі")}   Ходів: {m.Count}" + (board.IsTerminal ? "  |  ГРА ЗАВЕРШЕНА" : "");
+        string positionKind = PositionAnalysis.Classify(board) switch
+        {
+            PositionKind.Risky => "гостра (ризикована)",
+            PositionKind.Quiet => "спокійна",
+            _ => "завершена"
+        };
+        status.Text += Environment.NewLine + "Позиція: " + positionKind;
     }
 
     void MakeMove(Move move)
@@ -236,13 +251,22 @@ public sealed class MainForm : Form
         bool ab = algo.SelectedIndex == 0;
         var order = Order;
         var eval = Eval;
+        int extraDepth = quiescence.Checked ? 2 : 0;
         using var cts = new CancellationTokenSource();
         searchCancellation = cts;
         SetBusy(true);
         details.Text = "Пошук триває… Можна скасувати обчислення.";
         try
         {
-            var result = await Task.Run(() => new SearchEngine().FindBest(position, selectedDepth, ab, order, eval, 20000, cts.Token));
+            var result = await Task.Run(() => new SearchEngine().FindBest(
+                position,
+                selectedDepth,
+                ab,
+                order,
+                eval,
+                20000,
+                cts.Token,
+                quiescenceDepth: extraDepth));
             if (IsDisposed || Disposing)
                 return;
             cts.Token.ThrowIfCancellationRequested();
@@ -252,6 +276,7 @@ public sealed class MainForm : Form
             NormalizePass();
             RefreshBoard();
             details.Text = $"Хід: {last.Move?.ToString() ?? "PASS"}\r\nОцінка MAX: {last.Score}\r\nВузлів: {last.Nodes}\r\nЛистків: {last.Leaves}\r\nВідтинань: {last.Cutoffs}\r\nЧас: {last.Milliseconds:F2} мс\r\n\r\nОберіть «Дерево та alpha/beta» для трасування.";
+            details.Text += $"\r\nПродовжень гострих позицій: {last.Extensions}";
         }
         catch (OperationCanceledException)
         {
@@ -285,6 +310,7 @@ public sealed class MainForm : Form
         int maxDepth = Math.Min(5, (int)depth.Value);
         var order = Order;
         var eval = Eval;
+        int extraDepth = quiescence.Checked ? 2 : 0;
         using var cts = new CancellationTokenSource();
         searchCancellation = cts;
         SetBusy(true);
@@ -296,8 +322,10 @@ public sealed class MainForm : Form
                 var sb = new StringBuilder();
                 foreach (int d in Enumerable.Range(1, maxDepth))
                 {
-                    var plain = new SearchEngine().FindBest(position, d, false, order, eval, 0, cts.Token);
-                    var optimized = new SearchEngine().FindBest(position, d, true, order, eval, 0, cts.Token);
+                    var plain = new SearchEngine().FindBest(
+                        position, d, false, order, eval, 0, cts.Token, extraDepth);
+                    var optimized = new SearchEngine().FindBest(
+                        position, d, true, order, eval, 0, cts.Token, extraDepth);
                     sb.AppendLine($"Глибина {d}: Minimax {plain.Nodes} вузлів / {plain.Milliseconds:F1} мс; Alpha-Beta {optimized.Nodes} вузлів / {optimized.Milliseconds:F1} мс; відтинань {optimized.Cutoffs}; оцінки {plain.Score}/{optimized.Score}; збіг: {plain.Score == optimized.Score}");
                 }
 

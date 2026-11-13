@@ -1,0 +1,44 @@
+[
+  {
+    "Id": 1,
+    "Parent": 0,
+    "Ply": 1,
+    "Player": "MIN",
+    "Move": "A1",
+    "Score": 1188,
+    "AlphaBefore": -2147483648,
+    "BetaBefore": 2147483647,
+    "AlphaAfter": -2147483648,
+    "BetaAfter": 2147483647,
+    "Cutoff": false,
+    "Reason": "depth limit"
+  },
+  {
+    "Id": 2,
+    "Parent": 0,
+    "Ply": 1,
+    "Player": "MIN",
+    "Move": "H1",
+    "Score": 1188,
+    "AlphaBefore": 1188,
+    "BetaBefore": 2147483647,
+    "AlphaAfter": 1188,
+    "BetaAfter": 2147483647,
+    "Cutoff": false,
+    "Reason": "depth limit"
+  },
+  {
+    "Id": 0,
+    "Parent": null,
+    "Ply": 0,
+    "Player": "MAX",
+    "Move": "ROOT",
+    "Score": 1188,
+    "AlphaBefore": -2147483648,
+    "BetaBefore": 2147483647,
+    "AlphaAfter": 1188,
+    "BetaAfter": 2147483647,
+    "Cutoff": false,
+    "Reason": "expanded"
+  }
+]

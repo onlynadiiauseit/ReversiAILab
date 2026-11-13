@@ -1,0 +1,72 @@
+[
+  {
+    "Id": 1,
+    "Parent": 0,
+    "Ply": 1,
+    "Player": "MIN",
+    "Move": "D3",
+    "Score": -28,
+    "AlphaBefore": -2147483648,
+    "BetaBefore": 2147483647,
+    "AlphaAfter": -2147483648,
+    "BetaAfter": 2147483647,
+    "Cutoff": false,
+    "Reason": "depth limit"
+  },
+  {
+    "Id": 2,
+    "Parent": 0,
+    "Ply": 1,
+    "Player": "MIN",
+    "Move": "C4",
+    "Score": -28,
+    "AlphaBefore": -28,
+    "BetaBefore": 2147483647,
+    "AlphaAfter": -28,
+    "BetaAfter": 2147483647,
+    "Cutoff": false,
+    "Reason": "depth limit"
+  },
+  {
+    "Id": 3,
+    "Parent": 0,
+    "Ply": 1,
+    "Player": "MIN",
+    "Move": "F5",
+    "Score": -28,
+    "AlphaBefore": -28,
+    "BetaBefore": 2147483647,
+    "AlphaAfter": -28,
+    "BetaAfter": 2147483647,
+    "Cutoff": false,
+    "Reason": "depth limit"
+  },
+  {
+    "Id": 4,
+    "Parent": 0,
+    "Ply": 1,
+    "Player": "MIN",
+    "Move": "E6",
+    "Score": -28,
+    "AlphaBefore": -28,
+    "BetaBefore": 2147483647,
+    "AlphaAfter": -28,
+    "BetaAfter": 2147483647,
+    "Cutoff": false,
+    "Reason": "depth limit"
+  },
+  {
+    "Id": 0,
+    "Parent": null,
+    "Ply": 0,
+    "Player": "MAX",
+    "Move": "ROOT",
+    "Score": -28,
+    "AlphaBefore": -2147483648,
+    "BetaBefore": 2147483647,
+    "AlphaAfter": -28,
+    "BetaAfter": 2147483647,
+    "Cutoff": false,
+    "Reason": "expanded"
+  }
+]
