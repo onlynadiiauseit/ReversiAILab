@@ -3,40 +3,132 @@ using System.Text;
 using System.Text.Json;
 using System.Runtime.InteropServices;
 using Reversi.Core;
+
 CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
-string output = args.Length > 0 ? args[0] : "results"; Directory.CreateDirectory(output);
-var positions = new Dictionary<string, Board> { { "opening", new Board() } };
-// Deterministic midgame/endgame positions obtained by replaying legal moves, not hand-invented boards.
-Board b = new(); int turn = 0; while (!b.IsTerminal && turn < 57) { var legal = b.LegalMoves(b.Turn); b = b.Play(legal.Count == 0 ? null : legal[(turn * 7 + 3) % legal.Count]); turn++; if (turn == 22) positions["midgame"] = b.Clone(); if (turn == 50) positions["endgame"] = b.Clone(); }
-var measurements = new List<Measurement>();
-using var csv = new StreamWriter(Path.Combine(output, "experiments.csv"), false, new UTF8Encoding(false)); csv.WriteLine("position,depth,method,ordering,evaluation,run,best_move,score,nodes,leaves,cutoffs,milliseconds");
-foreach (var (name, pos) in positions) foreach (int depth in new[] { 2, 3, 4, 5 }) foreach (var mode in new[] { EvaluationMode.DiscDifference, EvaluationMode.Positional }) foreach (var order in new[] { Ordering.Natural, Ordering.BestFirst, Ordering.WorstFirst })
+string output = args.Length > 0 ? args[0] : "results";
+Directory.CreateDirectory(output);
+var positions = new Dictionary<string, Board>
 {
-    var baseline = new SearchEngine().FindBest(pos, depth, false, order, mode, 0);
-    // Warm both methods outside recorded measurements and alternate measurement order.
-    var warm = new SearchEngine().FindBest(pos, depth, true, order, mode, 0);
-    if (warm.Score != baseline.Score) throw new Exception("Warmup score mismatch");
-    for (int run = 1; run <= 3; run++) foreach (bool ab in run % 2 == 1 ? new[] { false, true } : new[] { true, false })
     {
-        var result = new SearchEngine().FindBest(pos, depth, ab, order, mode, 0);
-        if (result.Score != baseline.Score || (ab && result.Nodes > baseline.Nodes)) throw new Exception($"Incorrect search: {name} d={depth} {order} {mode}");
-        measurements.Add(new(name, depth, ab ? "alphabeta" : "minimax", order.ToString(), mode.ToString(), result));
-        csv.WriteLine($"{name},{depth},{(ab ? "alphabeta" : "minimax")},{order},{mode},{run},{result.Move?.ToString() ?? "PASS"},{result.Score},{result.Nodes},{result.Leaves},{result.Cutoffs},{result.Milliseconds:F4}");
+        "opening",
+        new Board()
     }
-    csv.Flush(); Console.WriteLine($"{name} d={depth} {mode} {order}: {baseline.Nodes} -> {warm.Nodes} nodes");
+};
+// Deterministic midgame/endgame positions obtained by replaying legal moves, not hand-invented boards.
+Board b = new();
+int turn = 0;
+while (!b.IsTerminal && turn < 57)
+{
+    var legal = b.LegalMoves(b.Turn);
+    b = b.Play(legal.Count == 0 ? null : legal[(turn * 7 + 3) % legal.Count]);
+    turn++;
+    if (turn == 22)
+        positions["midgame"] = b.Clone();
+    if (turn == 50)
+        positions["endgame"] = b.Clone();
 }
-var options = new JsonSerializerOptions { WriteIndented = true };
+
+var measurements = new List<Measurement>();
+using var csv = new StreamWriter(
+    Path.Combine(output, "experiments.csv"),
+    false,
+    new UTF8Encoding(false));
+csv.WriteLine("position,depth,method,ordering,evaluation,run,best_move,score,nodes,leaves,cutoffs,milliseconds");
+foreach (var (name, pos) in positions)
+    foreach (int depth in new[] { 2, 3, 4, 5 })
+        foreach (var mode in new[] { EvaluationMode.DiscDifference, EvaluationMode.Positional })
+            foreach (var order in new[] { Ordering.Natural, Ordering.BestFirst, Ordering.WorstFirst })
+            {
+                var baseline = new SearchEngine().FindBest(pos, depth, false, order, mode, 0);
+                // Warm both methods outside recorded measurements and alternate measurement order.
+                var warm = new SearchEngine().FindBest(pos, depth, true, order, mode, 0);
+                if (warm.Score != baseline.Score)
+                    throw new Exception("Warmup score mismatch");
+                for (int run = 1; run <= 3; run++)
+                    foreach (bool ab in run % 2 == 1 ? new[] { false, true }
+
+                    : new[] { true, false })
+                    {
+                        var result = new SearchEngine().FindBest(pos, depth, ab, order, mode, 0);
+                        if (result.Score != baseline.Score || (ab && result.Nodes > baseline.Nodes))
+                            throw new Exception($"Incorrect search: {name} d={depth} {order} {mode}");
+                        measurements.Add(new(
+                                name,
+                                depth,
+                                ab ? "alphabeta" : "minimax",
+                                order.ToString(),
+                                mode.ToString(),
+                                result));
+                        csv.WriteLine($"{name},{depth},{(ab ? "alphabeta" : "minimax")},{order},{mode},{run},{result.Move?.ToString() ?? "PASS"},{result.Score},{result.Nodes},{result.Leaves},{result.Cutoffs},{result.Milliseconds:F4}");
+                    }
+
+                csv.Flush();
+                Console.WriteLine($"{name} d={depth} {mode} {order}: {baseline.Nodes} -> {warm.Nodes} nodes");
+            }
+
+var options = new JsonSerializerOptions
+{
+    WriteIndented = true
+};
 var summary = measurements.GroupBy(x => (x.Position, x.Depth, x.Ordering, x.Evaluation)).Select(g =>
 {
-    var plain = g.Where(x => x.Method == "minimax").Select(x => x.Result).ToArray(); var ab = g.Where(x => x.Method == "alphabeta").Select(x => x.Result).ToArray();
-    return new { g.Key.Position, g.Key.Depth, g.Key.Ordering, g.Key.Evaluation, Score = plain[0].Score, MinimaxNodes = plain[0].Nodes, AlphaBetaNodes = ab[0].Nodes, ReductionPercent = 100.0 * (1.0 - (double)ab[0].Nodes / plain[0].Nodes), MinimaxMedianMs = plain.Select(x => x.Milliseconds).Order().ElementAt(1), AlphaBetaMedianMs = ab.Select(x => x.Milliseconds).Order().ElementAt(1), AlphaBetaCutoffs = ab[0].Cutoffs };
+    var plain = g.Where(x => x.Method == "minimax").Select(x => x.Result).ToArray();
+    var ab = g.Where(x => x.Method == "alphabeta").Select(x => x.Result).ToArray();
+    return new
+    {
+        g.Key.Position,
+        g.Key.Depth,
+        g.Key.Ordering,
+        g.Key.Evaluation,
+        Score = plain[0].Score,
+        MinimaxNodes = plain[0].Nodes,
+        AlphaBetaNodes = ab[0].Nodes,
+        ReductionPercent = 100.0 * (1.0 - (double)ab[0].Nodes / plain[0].Nodes),
+        MinimaxMedianMs = plain.Select(x => x.Milliseconds).Order().ElementAt(1),
+        AlphaBetaMedianMs = ab.Select(x => x.Milliseconds).Order().ElementAt(1),
+        AlphaBetaCutoffs = ab[0].Cutoffs
+    };
 }).ToArray();
 File.WriteAllText(Path.Combine(output, "summary.json"), JsonSerializer.Serialize(summary, options));
-File.WriteAllText(Path.Combine(output, "environment.json"), JsonSerializer.Serialize(new { CapturedUtc = DateTimeOffset.UtcNow, OS = RuntimeInformation.OSDescription, Architecture = RuntimeInformation.OSArchitecture.ToString(), Framework = RuntimeInformation.FrameworkDescription, LogicalProcessors = Environment.ProcessorCount, BuildConfiguration = "Release (run with -c Release)", Measurements = measurements.Count, Warmup = "One unrecorded search per method and configuration", Repeats = 3, MethodOrder = "Alternates by repeat", DepthConvention = "Transitions including forced passes", CutoffConvention = "Only when a remaining child is skipped" }, options));
+File.WriteAllText(
+    Path.Combine(output, "environment.json"),
+    JsonSerializer.Serialize(
+        new
+        {
+            CapturedUtc = DateTimeOffset.UtcNow,
+            OS = RuntimeInformation.OSDescription,
+            Architecture = RuntimeInformation.OSArchitecture.ToString(),
+            Framework = RuntimeInformation.FrameworkDescription,
+            LogicalProcessors = Environment.ProcessorCount,
+            BuildConfiguration = "Release (run with -c Release)",
+            Measurements = measurements.Count,
+            Warmup = "One unrecorded search per method and configuration",
+            Repeats = 3,
+            MethodOrder = "Alternates by repeat",
+            DepthConvention = "Transitions including forced passes",
+            CutoffConvention = "Only when a remaining child is skipped"
+        },
+        options));
 // A small trace exported for the report. Postorder entries include IDs and parent IDs.
-var traced = new SearchEngine().FindBest(positions["midgame"], 3, true, Ordering.BestFirst, EvaluationMode.Positional, 10000);
-File.WriteAllText(Path.Combine(output, "tree_midgame.json"), JsonSerializer.Serialize(traced.Trace, new JsonSerializerOptions { WriteIndented = true }));
-File.WriteAllText(Path.Combine(output, "positions.txt"), string.Join("\n\n", positions.Select(x => $"{x.Key} (turn {(x.Value.Turn == 1 ? "B" : "W")})\n{x.Value}")));
-if (traced.Trace.Count != traced.Nodes) throw new Exception("Report trace unexpectedly truncated");
+var traced = new SearchEngine().FindBest(
+    positions["midgame"],
+    3,
+    true,
+    Ordering.BestFirst,
+    EvaluationMode.Positional,
+    10000);
+File.WriteAllText(
+    Path.Combine(output, "tree_midgame.json"),
+    JsonSerializer.Serialize(
+        traced.Trace,
+        new JsonSerializerOptions { WriteIndented = true }));
+File.WriteAllText(
+    Path.Combine(output, "positions.txt"),
+    string.Join(
+        "\n\n",
+        positions.Select(x => $"{x.Key} (turn {(x.Value.Turn == 1 ? "B" : "W")})\n{x.Value}")));
+if (traced.Trace.Count != traced.Nodes)
+    throw new Exception("Report trace unexpectedly truncated");
 Console.WriteLine($"Completed {measurements.Count} verified measurements. Results written to " + Path.GetFullPath(output));
+
 sealed record Measurement(string Position, int Depth, string Method, string Ordering, string Evaluation, SearchResult Result);
