@@ -288,13 +288,13 @@ table(['Група', 'Що перевірено'],[
     ['Трасування', 'Корінь і батьки при ліміті; повне покриття; коректні межі та Cutoffs'],
     ['Скасування', 'Скасований CancellationToken перериває пошук']
 ],[3.5,13.5],10)
-p('Графічний застосунок виконує один хід AI за натисканням кнопки. Ручні ходи доступні обом сторонам. Позначки на дошці показують допустимі клітинки; за необхідності інтерфейс автоматично застосовує вимушений пропуск.')
+p('Графічний застосунок виконує один хід комп’ютера за натисканням кнопки. Ручні ходи доступні обом сторонам. Позначки на дошці показують допустимі клітинки; за необхідності інтерфейс автоматично застосовує вимушений пропуск.')
 p('Пошук і порівняння виконуються через Task.Run. На час розрахунку налаштування та ручні ходи блокуються, а кнопка «Скасувати» залишається доступною. Після скасування незавершений результат не застосовується. Закриття форми також надсилає запит на скасування.')
 p('Після ручного ходу попередня траса очищується, щоб журнал не сприймався як результат пошуку для нової позиції. Розмір дошки пристосовується до розміру вікна. Автоматична перевірка збірки й консольних тестів налаштована у GitHub Actions для Windows.')
 
 page('9 Відтворення та висновки')
-p('Для запуску потрібен .NET 10 SDK. Модулі правил, тестів і експериментів не використовують Windows Forms; графічний застосунок потребує Windows. Відкрити можна ReversiAILab.sln або Reversi.Desktop.csproj.')
-commands=p('dotnet build ReversiAILab.sln -c Release\ndotnet run --project Reversi.Tests -c Release\ndotnet run --project Reversi.Experiments -c Release -- results\ndotnet run --project Reversi.Desktop -c Release')
+p('Для запуску потрібен .NET 10 SDK. Модулі правил, тестів і експериментів не використовують Windows Forms; графічний застосунок потребує Windows. Відкрити можна ReversiLab.sln або Reversi.Desktop.csproj.')
+commands=p('dotnet build ReversiLab.sln -c Release\ndotnet run --project Reversi.Tests -c Release\ndotnet run --project Reversi.Experiments -c Release -- results\ndotnet run --project Reversi.Desktop -c Release')
 for run in commands.runs:
     run.font.name='Consolas';run.font.size=Pt(9)
 p('Скрипт scripts/build_report.py відтворює документ і діаграму зі збережених CSV/JSON та протоколу перевірок. Йому потрібні python-docx і Pillow. Зміни коду, налаштувань або обладнання потребують нового запуску експериментів; часові значення нового запуску можуть відрізнятися.')
@@ -307,5 +307,7 @@ p('[1] World Othello Federation. Official rules for the game Othello.\nhttps://w
 p('[2] University of California Berkeley. CS 188 Textbook. Minimax.\nhttps://inst.eecs.berkeley.edu/~cs188/textbook/games/minimax.html')
 p('[3] Первинні матеріали дослідження: код Reversi.Core, results/experiments.csv, summary.json, tree_midgame.json, positions.txt, environment.json та tests.txt. Дата виконання 13 листопада 2026 року.')
 destination=ROOT/'docs/Reversi_Звіт_Черниченко.docx'
-doc.save(destination)
+temporary = destination.with_name(destination.stem + '.tmp.docx')
+doc.save(temporary)
+temporary.replace(destination)
 print(destination)

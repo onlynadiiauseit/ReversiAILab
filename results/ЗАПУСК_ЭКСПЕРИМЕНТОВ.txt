@@ -1,7 +1,7 @@
 ЭКСПЕРИМЕНТЫ ВЫПОЛНЕНЫ 13 НОЯБРЯ 2026 ГОДА.
 Release, .NET SDK 10.0.401. Пройдено 200 проверок и 432 измерения.
 
-Откройте PowerShell в папке ReversiAILab и выполните:
+Откройте PowerShell в папке ReversiLab и выполните:
   dotnet run --project Reversi.Tests -c Release
   dotnet run --project Reversi.Experiments -c Release -- results
 
