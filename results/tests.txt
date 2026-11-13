@@ -1,0 +1,201 @@
+﻿PASS opening has four legal moves
+PASS initial discs
+PASS D3 legal for black
+PASS flip in D3
+PASS board is immutable across Play
+PASS illegal move rejected
+PASS illegal pass rejected
+PASS terminal utility win
+PASS terminal draw
+PASS forced pass position
+PASS pass changes player
+PASS same minimax score d=1 order=Natural eval=DiscDifference
+PASS alpha beta visits no more nodes d=1 order=Natural eval=DiscDifference
+PASS same minimax score d=1 order=Natural eval=Positional
+PASS alpha beta visits no more nodes d=1 order=Natural eval=Positional
+PASS same minimax score d=1 order=BestFirst eval=DiscDifference
+PASS alpha beta visits no more nodes d=1 order=BestFirst eval=DiscDifference
+PASS same minimax score d=1 order=BestFirst eval=Positional
+PASS alpha beta visits no more nodes d=1 order=BestFirst eval=Positional
+PASS same minimax score d=1 order=WorstFirst eval=DiscDifference
+PASS alpha beta visits no more nodes d=1 order=WorstFirst eval=DiscDifference
+PASS same minimax score d=1 order=WorstFirst eval=Positional
+PASS alpha beta visits no more nodes d=1 order=WorstFirst eval=Positional
+PASS same minimax score d=2 order=Natural eval=DiscDifference
+PASS alpha beta visits no more nodes d=2 order=Natural eval=DiscDifference
+PASS same minimax score d=2 order=Natural eval=Positional
+PASS alpha beta visits no more nodes d=2 order=Natural eval=Positional
+PASS same minimax score d=2 order=BestFirst eval=DiscDifference
+PASS alpha beta visits no more nodes d=2 order=BestFirst eval=DiscDifference
+PASS same minimax score d=2 order=BestFirst eval=Positional
+PASS alpha beta visits no more nodes d=2 order=BestFirst eval=Positional
+PASS same minimax score d=2 order=WorstFirst eval=DiscDifference
+PASS alpha beta visits no more nodes d=2 order=WorstFirst eval=DiscDifference
+PASS same minimax score d=2 order=WorstFirst eval=Positional
+PASS alpha beta visits no more nodes d=2 order=WorstFirst eval=Positional
+PASS same minimax score d=3 order=Natural eval=DiscDifference
+PASS alpha beta visits no more nodes d=3 order=Natural eval=DiscDifference
+PASS same minimax score d=3 order=Natural eval=Positional
+PASS alpha beta visits no more nodes d=3 order=Natural eval=Positional
+PASS same minimax score d=3 order=BestFirst eval=DiscDifference
+PASS alpha beta visits no more nodes d=3 order=BestFirst eval=DiscDifference
+PASS same minimax score d=3 order=BestFirst eval=Positional
+PASS alpha beta visits no more nodes d=3 order=BestFirst eval=Positional
+PASS same minimax score d=3 order=WorstFirst eval=DiscDifference
+PASS alpha beta visits no more nodes d=3 order=WorstFirst eval=DiscDifference
+PASS same minimax score d=3 order=WorstFirst eval=Positional
+PASS alpha beta visits no more nodes d=3 order=WorstFirst eval=Positional
+PASS same minimax score d=4 order=Natural eval=DiscDifference
+PASS alpha beta visits no more nodes d=4 order=Natural eval=DiscDifference
+PASS same minimax score d=4 order=Natural eval=Positional
+PASS alpha beta visits no more nodes d=4 order=Natural eval=Positional
+PASS same minimax score d=4 order=BestFirst eval=DiscDifference
+PASS alpha beta visits no more nodes d=4 order=BestFirst eval=DiscDifference
+PASS same minimax score d=4 order=BestFirst eval=Positional
+PASS alpha beta visits no more nodes d=4 order=BestFirst eval=Positional
+PASS same minimax score d=4 order=WorstFirst eval=DiscDifference
+PASS alpha beta visits no more nodes d=4 order=WorstFirst eval=DiscDifference
+PASS same minimax score d=4 order=WorstFirst eval=Positional
+PASS alpha beta visits no more nodes d=4 order=WorstFirst eval=Positional
+PASS search chooses forced pass
+PASS invalid player rejected
+PASS invalid move-generation side rejected
+PASS invalid capture side rejected
+PASS null rows rejected
+PASS invalid cells rejected
+PASS negative pass count rejected
+PASS external board mutation rejected
+PASS terminal pass rejected
+PASS utility rejects unfinished board
+PASS invalid depth rejected
+PASS invalid ordering rejected
+PASS invalid trace limit rejected
+PASS search cancellation
+PASS out of bounds -1,0
+PASS out of bounds 0,-1
+PASS out of bounds 8,0
+PASS out of bounds 0,8
+PASS captures all eight directions
+PASS all captured lines flipped
+PASS game ends with empty squares when both sides blocked
+PASS exact terminal loss utility
+PASS move resets pass counter
+PASS antisymmetric evaluation DiscDifference
+PASS antisymmetric evaluation Positional
+PASS opening perft depth 1
+PASS opening perft depth 2
+PASS opening perft depth 3
+PASS opening perft depth 4
+PASS opening perft depth 5
+PASS opening perft depth 6
+PASS bounded trace retains root
+PASS bounded trace retains parents
+PASS complete trace covers every visited node
+PASS trace cutoff count matches statistics
+PASS cutoff bounds valid
+PASS single child is never counted as pruning
+PASS exact endgame seed=0 DiscDifference Natural
+PASS chosen endgame move optimal seed=0 DiscDifference Natural
+PASS exact endgame seed=0 DiscDifference BestFirst
+PASS chosen endgame move optimal seed=0 DiscDifference BestFirst
+PASS exact endgame seed=0 DiscDifference WorstFirst
+PASS chosen endgame move optimal seed=0 DiscDifference WorstFirst
+PASS exact endgame seed=0 Positional Natural
+PASS chosen endgame move optimal seed=0 Positional Natural
+PASS exact endgame seed=0 Positional BestFirst
+PASS chosen endgame move optimal seed=0 Positional BestFirst
+PASS exact endgame seed=0 Positional WorstFirst
+PASS chosen endgame move optimal seed=0 Positional WorstFirst
+PASS full legal game invariants seed=0
+PASS exact endgame seed=1 DiscDifference Natural
+PASS chosen endgame move optimal seed=1 DiscDifference Natural
+PASS exact endgame seed=1 DiscDifference BestFirst
+PASS chosen endgame move optimal seed=1 DiscDifference BestFirst
+PASS exact endgame seed=1 DiscDifference WorstFirst
+PASS chosen endgame move optimal seed=1 DiscDifference WorstFirst
+PASS exact endgame seed=1 Positional Natural
+PASS chosen endgame move optimal seed=1 Positional Natural
+PASS exact endgame seed=1 Positional BestFirst
+PASS chosen endgame move optimal seed=1 Positional BestFirst
+PASS exact endgame seed=1 Positional WorstFirst
+PASS chosen endgame move optimal seed=1 Positional WorstFirst
+PASS full legal game invariants seed=1
+PASS exact endgame seed=2 DiscDifference Natural
+PASS chosen endgame move optimal seed=2 DiscDifference Natural
+PASS exact endgame seed=2 DiscDifference BestFirst
+PASS chosen endgame move optimal seed=2 DiscDifference BestFirst
+PASS exact endgame seed=2 DiscDifference WorstFirst
+PASS chosen endgame move optimal seed=2 DiscDifference WorstFirst
+PASS exact endgame seed=2 Positional Natural
+PASS chosen endgame move optimal seed=2 Positional Natural
+PASS exact endgame seed=2 Positional BestFirst
+PASS chosen endgame move optimal seed=2 Positional BestFirst
+PASS exact endgame seed=2 Positional WorstFirst
+PASS chosen endgame move optimal seed=2 Positional WorstFirst
+PASS full legal game invariants seed=2
+PASS exact endgame seed=3 DiscDifference Natural
+PASS chosen endgame move optimal seed=3 DiscDifference Natural
+PASS exact endgame seed=3 DiscDifference BestFirst
+PASS chosen endgame move optimal seed=3 DiscDifference BestFirst
+PASS exact endgame seed=3 DiscDifference WorstFirst
+PASS chosen endgame move optimal seed=3 DiscDifference WorstFirst
+PASS exact endgame seed=3 Positional Natural
+PASS chosen endgame move optimal seed=3 Positional Natural
+PASS exact endgame seed=3 Positional BestFirst
+PASS chosen endgame move optimal seed=3 Positional BestFirst
+PASS exact endgame seed=3 Positional WorstFirst
+PASS chosen endgame move optimal seed=3 Positional WorstFirst
+PASS full legal game invariants seed=3
+PASS exact endgame seed=4 DiscDifference Natural
+PASS chosen endgame move optimal seed=4 DiscDifference Natural
+PASS exact endgame seed=4 DiscDifference BestFirst
+PASS chosen endgame move optimal seed=4 DiscDifference BestFirst
+PASS exact endgame seed=4 DiscDifference WorstFirst
+PASS chosen endgame move optimal seed=4 DiscDifference WorstFirst
+PASS exact endgame seed=4 Positional Natural
+PASS chosen endgame move optimal seed=4 Positional Natural
+PASS exact endgame seed=4 Positional BestFirst
+PASS chosen endgame move optimal seed=4 Positional BestFirst
+PASS exact endgame seed=4 Positional WorstFirst
+PASS chosen endgame move optimal seed=4 Positional WorstFirst
+PASS full legal game invariants seed=4
+PASS exact endgame seed=5 DiscDifference Natural
+PASS chosen endgame move optimal seed=5 DiscDifference Natural
+PASS exact endgame seed=5 DiscDifference BestFirst
+PASS chosen endgame move optimal seed=5 DiscDifference BestFirst
+PASS exact endgame seed=5 DiscDifference WorstFirst
+PASS chosen endgame move optimal seed=5 DiscDifference WorstFirst
+PASS exact endgame seed=5 Positional Natural
+PASS chosen endgame move optimal seed=5 Positional Natural
+PASS exact endgame seed=5 Positional BestFirst
+PASS chosen endgame move optimal seed=5 Positional BestFirst
+PASS exact endgame seed=5 Positional WorstFirst
+PASS chosen endgame move optimal seed=5 Positional WorstFirst
+PASS full legal game invariants seed=5
+PASS exact endgame seed=6 DiscDifference Natural
+PASS chosen endgame move optimal seed=6 DiscDifference Natural
+PASS exact endgame seed=6 DiscDifference BestFirst
+PASS chosen endgame move optimal seed=6 DiscDifference BestFirst
+PASS exact endgame seed=6 DiscDifference WorstFirst
+PASS chosen endgame move optimal seed=6 DiscDifference WorstFirst
+PASS exact endgame seed=6 Positional Natural
+PASS chosen endgame move optimal seed=6 Positional Natural
+PASS exact endgame seed=6 Positional BestFirst
+PASS chosen endgame move optimal seed=6 Positional BestFirst
+PASS exact endgame seed=6 Positional WorstFirst
+PASS chosen endgame move optimal seed=6 Positional WorstFirst
+PASS full legal game invariants seed=6
+PASS exact endgame seed=7 DiscDifference Natural
+PASS chosen endgame move optimal seed=7 DiscDifference Natural
+PASS exact endgame seed=7 DiscDifference BestFirst
+PASS chosen endgame move optimal seed=7 DiscDifference BestFirst
+PASS exact endgame seed=7 DiscDifference WorstFirst
+PASS chosen endgame move optimal seed=7 DiscDifference WorstFirst
+PASS exact endgame seed=7 Positional Natural
+PASS chosen endgame move optimal seed=7 Positional Natural
+PASS exact endgame seed=7 Positional BestFirst
+PASS chosen endgame move optimal seed=7 Positional BestFirst
+PASS exact endgame seed=7 Positional WorstFirst
+PASS chosen endgame move optimal seed=7 Positional WorstFirst
+PASS full legal game invariants seed=7
+ALL 200 TESTS PASSED

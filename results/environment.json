@@ -1,0 +1,16 @@
+﻿{
+    "CapturedUtc":  "2026-11-13T07:18:26.635631+00:00",
+    "OS":  "Microsoft Windows 10.0.26200",
+    "Architecture":  "X64",
+    "Framework":  ".NET 10.0.12",
+    "LogicalProcessors":  12,
+    "BuildConfiguration":  "Release (run with -c Release)",
+    "Measurements":  432,
+    "Warmup":  "One unrecorded search per method and configuration",
+    "Repeats":  3,
+    "MethodOrder":  "Alternates by repeat",
+    "DepthConvention":  "Transitions including forced passes",
+    "CutoffConvention":  "Only when a remaining child is skipped",
+    "CPU":  "AMD Ryzen 5 7430U with Radeon Graphics",
+    "SDK":  "10.0.401"
+}

@@ -1,0 +1,6 @@
+Откройте ReversiAILab.sln в Visual Studio 2026.
+В Solution Explorer будут четыре проекта.
+ПКМ по Reversi.Desktop -> Set as Startup Project -> F5.
+Тесты: ПКМ Reversi.Tests -> Set as Startup Project -> Ctrl+F5.
+Эксперименты: ПКМ Reversi.Experiments -> Set as Startup Project -> Ctrl+F5.
+Либо выполняйте команды из README.md.

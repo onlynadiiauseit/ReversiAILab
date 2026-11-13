@@ -1,0 +1,16 @@
+ЭКСПЕРИМЕНТЫ ВЫПОЛНЕНЫ 13 НОЯБРЯ 2026 ГОДА.
+Release, .NET SDK 10.0.401. Пройдено 200 проверок и 432 измерения.
+
+Откройте PowerShell в папке ReversiAILab и выполните:
+  dotnet run --project Reversi.Tests -c Release
+  dotnet run --project Reversi.Experiments -c Release -- results
+
+Сохранённые результаты:
+  results/experiments.csv
+  results/tree_midgame.json
+  results/positions.txt
+  results/summary.json
+  results/environment.json
+  results/tests.txt
+
+В звіт внесены реальные результаты, медианы времени, диаграмма и фактический пример отсечения из JSON. Повторный запуск перезапишет результаты; время зависит от оборудования и нагрузки.
